@@ -2,7 +2,7 @@ import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats {
-    private int size, trial_size;
+    private int size, trialSize;
     private double [] counts;
 
     public PercolationStats(int n, int trial) {
@@ -10,7 +10,7 @@ public class PercolationStats {
             throw new IllegalArgumentException("n or trial is less than 0");
         }
         size = n;
-        trial_size = trial;
+        trialSize = trial;
         counts = new double[trial];
         for (int i = 0; i < trial; i++) {
             int count = 0;
@@ -38,14 +38,14 @@ public class PercolationStats {
     public double confidenceLo() {
         double mu = mean();
         double sigma = stddev();
-        return (mu - (1.96 * sigma) / Math.sqrt(trial_size));
+        return (mu - (1.96 * sigma) / Math.sqrt(trialSize));
 
     }
 
     public double confidenceHi() {
         double mu = mean();
         double sigma = stddev();
-        return (mu + (1.96 * sigma) / Math.sqrt(trial_size));
+        return (mu + (1.96 * sigma) / Math.sqrt(trialSize));
     }
 
     public static void main(String [] args) {
