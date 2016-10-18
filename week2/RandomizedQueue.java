@@ -32,6 +32,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     public void enqueue(Item item) {
         if (item == null)
             throw new NullPointerException();
+        itemArr[n++] = item;
+        size++;
         if (n == itemArr.length) {
             if (size >= itemArr.length / 2) {
                 resize(2 * itemArr.length);
@@ -39,8 +41,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
                 resize(itemArr.length);
             }
         }
-        itemArr[n++] = item;
-        size++;
     }
 
     private void resize(int l) {
@@ -70,6 +70,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (ind == n - 1) {
             n--;
         }
+        if (size <= itemArr.length / 4) {
+            resize(itemArr.length / 2);
+        }
         return item;
     }
 
@@ -91,22 +94,27 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private class DequeIterator implements Iterator<Item> {
-        private int i = n;
         private int count = 0;
+        private boolean[] used = new boolean[n];
 
         public boolean hasNext() {
-            return i > 0 && count < size;
+            return count < size;
         }
 
         public Item next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            Item item = itemArr[--i];
-            count += 1;
-            while (item == null && i > 0) {
-                item = itemArr[--i];
+
+            int ind = StdRandom.uniform(n);
+            if (n == 0)
+                ind = 0;
+            while ((itemArr[ind] == null && n > 0) || used[ind]) {
+                ind = StdRandom.uniform(n);
             }
+            used[ind] = true;
+            Item item = itemArr[ind];
+            count++;
             return item;
         }
 
@@ -116,16 +124,21 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public static void main(String [] args) {
-        RandomizedQueue<Integer> rq = new RandomizedQueue<Integer>();
-//        rq.enqueue(2);
-//        rq.enqueue(3);
-        rq.size();
-        StdOut.println(rq.dequeue());
-        StdOut.println(rq.sample());
-//        StdOut.println(rq.sample());
-//        StdOut.println(rq.sample());
-        for (int s : rq) {
-            StdOut.println(s);
-        }
+//        RandomizedQueue<Integer> rq = new RandomizedQueue<Integer>();
+//        rq.isEmpty();
+//        rq.size();
+//        rq.isEmpty();
+//        rq.enqueue(30);
+//        rq.sample();
+//        rq.sample();
+//        rq.dequeue();
+//        rq.isEmpty();
+//        rq.isEmpty();
+//        rq.size();
+//        rq.size();
+//        rq.enqueue(14);
+//        for (int s : rq) {
+//            StdOut.println(s);
+//        }
     }
 }
