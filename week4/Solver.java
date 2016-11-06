@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
 
 public class Solver {
-    private int moves;
+    private int moves = -1;
     private SearchNode goalNode = null;
 
     private class SearchNode implements Comparable<SearchNode> {
@@ -20,12 +20,12 @@ public class Solver {
         }
 
         public int compareTo(SearchNode n) {
-            int nM = n.board.manhattan();
-            if (boardM == nM) {
-                return 0;
-            } else {
+            int nM = n.boardM;
+            int diff = boardM + moves - nM - n.moves;
+            if (diff == 0) {
                 return boardM - nM;
             }
+            return diff;
         }
     }
 
@@ -43,6 +43,7 @@ public class Solver {
         while (minq.size() > 0) {
             SearchNode curr = minq.delMin();
             SearchNode twinCurr = twinMinq.delMin();
+
             if (curr.board.isGoal()) {
                 goalNode = curr;
                 moves = goalNode.moves;
@@ -65,6 +66,7 @@ public class Solver {
             for (Board neighborBoard : twinCurr.board.neighbors()) {
                 if (twinCurr.previousSearchNode == null || !neighborBoard.equals(twinCurr.previousSearchNode.board)) {
                     SearchNode next = new SearchNode(neighborBoard);
+                    next.moves = twinCurr.moves + 1;
                     next.previousSearchNode = twinCurr;
                     twinMinq.insert(next);
                 }
@@ -79,23 +81,20 @@ public class Solver {
     }
 
     public int moves() {
-        if (isSolvable()) {
-            return moves;
-        } else {
-            return -1;
-        }
+        return moves;
     }
 
     public Iterable<Board> solution() {
         Stack<Board> stack = new Stack<Board>();
         if (goalNode == null) return null;
-        stack.push(goalNode.board);
-        SearchNode pointer = goalNode;
-        while (pointer.previousSearchNode != null) {
-            pointer = pointer.previousSearchNode;
-            stack.push(pointer.board);
-        }
+        pushPreSolution(goalNode, stack);
         return stack;
+    }
+
+    private void pushPreSolution(SearchNode node, Stack<Board> stack) {
+        if (node == null) return;
+        pushPreSolution(node.previousSearchNode, stack);
+        stack.push(node.board);
     }
 
     public static void main(String[] args) {

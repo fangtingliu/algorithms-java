@@ -8,7 +8,7 @@ public class Board {
     private int n;
 
     public Board(int[][] blocks) {
-        if (blocks == null) throw new java.lang.NullPointerException();
+        if (blocks == null) throw new NullPointerException();
         n = blocks.length;
         board = new int[n][n];
         for (int i = 0; i < n; i++) {
@@ -68,8 +68,12 @@ public class Board {
     }
 
     public boolean equals(Object y) {
-        if (y == null) throw new java.lang.NullPointerException();
-        return new String(toString()).equals(y.toString());
+        if (y == null) return false;
+        if (y.getClass() != getClass())
+            return false;
+        if (y == this)
+            return true;
+        return y.toString().equals(toString());
     }
 
     private void swap(int[][] blocks, int row1, int col1, int row2, int col2) {
@@ -142,20 +146,22 @@ public class Board {
     }
 
     public static void main(String[] args) {
-        In in = new In(args[0]);
-        int n = in.readInt();
-        int[][] blocks = new int[n][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                blocks[i][j] = in.readInt();
-        Board initial = new Board(blocks);
-        System.out.println(initial.isGoal());
-        System.out.println(initial.toString());
+//        In in = new In(args[0]);
+//        int n = in.readInt();
+//        int[][] blocks = new int[n][n];
+//        for (int i = 0; i < n; i++)
+//            for (int j = 0; j < n; j++)
+//                blocks[i][j] = in.readInt();
+//        Board initial = new Board(blocks);
+//        Board second = new Board(blocks);
+//        System.out.println(initial.isGoal());
+//        System.out.println(initial.toString());
 
-        for (Board board : initial.neighbors())
-            System.out.println(board.toString());
+//        for (Board board : initial.neighbors())
+//            System.out.println(board.toString());
 
-        System.out.println(initial.twin().equals(initial));
-        System.out.println(initial.equals(initial));
+//        System.out.println("twin: " + initial.twin().equals(initial));
+//        System.out.println("itself: " + initial.equals(initial));
+//        System.out.println("second: " + second.equals(initial));
     }
 }
