@@ -33,10 +33,10 @@ public class PointSET {
     }
 
     public void draw() {
-        StdDraw.clear();
+        StdDraw.setPenRadius(0.01);
         StdDraw.setPenColor(StdDraw.BLACK);
-        StdDraw.setXscale(-0.05, 1.05);
-        StdDraw.setYscale(-0.05, 1.05);   // leave a border to write text
+        StdDraw.setXscale(0.0, 1.0);
+        StdDraw.setYscale(0.0, 1.0);   // leave a border to write text
 
         for (Point2D p : set) {
             p.draw();
@@ -44,16 +44,13 @@ public class PointSET {
     }
 
     public Iterable<Point2D> range(RectHV rect) {
-        System.out.println("rect" + rect);
         if (rect == null) throw new NullPointerException();
         TreeSet<Point2D> rangeSet = new TreeSet<Point2D>();
         for (Point2D p : set) {
-            System.out.println("rect.contains(p)" + rect.contains(p) + p);
             if (rect.contains(p)) {
                 rangeSet.add(p);
             }
         }
-        System.out.println("rangeSet" + rangeSet);
         return rangeSet;
 
     }             // all points that are inside the rectangle

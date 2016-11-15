@@ -11,13 +11,12 @@ public class KdTree {
 
     private static class Node implements Comparable<Node> {
         private Point2D point;
-        private RectHV rect;    // the axis-aligned rectangle corresponding to this node
-        private Node left;        // the left/bottom subtree
-        private Node right;        // the right/top subtree
-        private boolean x;
+        private RectHV rect = null;
+        private Node left = null;
+        private Node right = null;
+        private boolean x = true;
 
         public int compareTo(Node n) {
-//            System.out.println("Node compare: " + point.x() + " n.point.x() " + n.point.x());
             if (x) {
                 return Double.compare(point.x(), n.point.x());
             } else {
@@ -27,7 +26,7 @@ public class KdTree {
     }
 
     public KdTree() {
-        root = null;
+        root = new Node();
         size = 0;
     }
 
@@ -42,44 +41,43 @@ public class KdTree {
     public void insert(Point2D p) {
         if (p == null) throw new NullPointerException();
         double x = p.x();
-        double y = p.y();
-        Node node = new Node();
-        node.point = p;
         if (size == 0) {
-            node.rect = new RectHV(x, 0, x, 1);
-            node.x = true;
-            root = node;
+            root.point = p;
+            root.rect = new RectHV(x, 0, x, 1);
+            size++;
         } else {
+            Node node = new Node();
+            node.point = p;
             insert(root, node);
         }
-        size++;
-//        System.out.println("Insert public size: " + size + " p.x() " + root.point);
     }
 
     private void insert(Node n, Node node) {
-        if (n.compareTo(node) <= 0) {
+        double diff = n.compareTo(node);
+        if (diff <= 0) {
+            if (diff == 0 && n.point.equals(node.point)) return;
             if (n.right == null) {
                 if (n.x) {
                     node.x = false;
                     node.rect = new RectHV(n.point.x(), node.point.y(), 1, node.point.y());
                 } else {
-                    node.x = true;
                     node.rect = new RectHV(node.point.x(), n.point.y(), node.point.x(), 1);
                 }
                 n.right = node;
+                size++;
             } else {
                 insert(n.right, node);
             }
-        } else if (n.compareTo(node) > 0) {
+        } else if (diff > 0) {
             if (n.left == null) {
                 if (n.x) {
                     node.x = false;
                     node.rect = new RectHV(node.point.x(), node.point.y(), n.point.x(), node.point.y());
                 } else {
-                    node.x = true;
                     node.rect = new RectHV(node.point.x(), 0, node.point.x(),  n.point.y());
                 }
                 n.left = node;
+                size++;
             } else {
                 insert(n.left, node);
             }
@@ -94,13 +92,13 @@ public class KdTree {
     }
 
     private boolean contains(Node n, Node node) {
-        if (n.compareTo(node) > 0) {
+        if (n.compareTo(node) <= 0) {
             if (node.right != null) {
                 return contains(node.right, node);
             } else {
                 return false;
             }
-        } else if (n.compareTo(node) < 0) {
+        } else if (n.compareTo(node) > 0) {
             if (node.left != null) {
                 return contains(node.left, node);
             } else {
@@ -114,14 +112,12 @@ public class KdTree {
     public void draw() {
         StdDraw.setXscale(0.0, 1.0);
         StdDraw.setYscale(0.0, 1.0);
-        System.out.println("in public draw" + root.point);
         draw(root);
     }
 
     private void draw(Node n) {
         StdDraw.setPenRadius(0.01);
         StdDraw.setPenColor(StdDraw.BLACK);
-        System.out.println("in private draw" + n.point + n.rect);
         n.point.draw();
 
         StdDraw.setPenRadius();
@@ -133,12 +129,10 @@ public class KdTree {
         n.rect.draw();
 
         if (n.left != null) {
-            System.out.println("left" + n.left.point);
             draw(n.left);
         }
 
         if (n.right != null) {
-            System.out.println("right" + n.right.point);
             draw(n.right);
         }
 
@@ -147,22 +141,21 @@ public class KdTree {
     public Iterable<Point2D> range(RectHV rect) {
         if (rect == null) throw new NullPointerException();
         TreeSet<Point2D> rangeSet = new TreeSet<Point2D>();
-        rangeSet = range(root, rect, rangeSet);
+        range(root, rect, rangeSet);
 //        System.out.println("rangeSet: " + rangeSet);
         return rangeSet;
     }
 
-    private TreeSet range(Node n, RectHV rect, TreeSet rangeSet) {
-        if (n == null) return rangeSet;
+    private void range(Node n, RectHV rect, TreeSet<Point2D> rangeSet) {
+        if (n == null) return;
 //        System.out.println("rangeSet private intersect: " + rect.intersects(n.rect) + n.point + rect.contains(n.point));
         if (rect.intersects(n.rect)) {
             if (rect.contains(n.point)) {
                 rangeSet.add(n.point);
             }
-            rangeSet = range(n.left, rect, rangeSet);
-            rangeSet = range(n.right, rect, rangeSet);
+            range(n.left, rect, rangeSet);
+            range(n.right, rect, rangeSet);
         }
-        return rangeSet;
     }
 
     public Point2D nearest(Point2D p) {
